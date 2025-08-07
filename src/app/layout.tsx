@@ -1,14 +1,16 @@
-import { SessionProvider } from "next-auth/react"
+import { Providers } from './components/Providers'
+import './globals.css'
 
-
-// Root layout component wrapping the app with NextAuth's SessionProvider
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
       <body>
-        <SessionProvider>{children}</SessionProvider>
+        <Providers>
+          {children}
+        </Providers>
       </body>
     </html>
   )
 }
+
 
