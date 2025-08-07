@@ -16,6 +16,7 @@ model User {
   ideas         Idea[]
   comments      Comment[]
   likes         Like[]
+  hashedPassword String?
 }
 
 model Idea {
