@@ -5,8 +5,16 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Lightbulb, Users, Rocket, ArrowDown } from "lucide-react"
 import Link from "next/link"
 import { motion } from "framer-motion"
+import { useEffect } from "react"
 
 export default function HomePage() {
+
+  // Scroll to top on page load- fixed bug with entering site
+  useEffect(() => {
+    window.scrollTo(0, 0)
+  }, [])
+
+
   return (
     <main className="flex flex-col min-h-screen bg-gradient-to-b from-[#0a0a0f] via-[#111122] to-[#1a1a2e] text-gray-200">
 
