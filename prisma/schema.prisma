@@ -35,7 +35,7 @@ model Idea {
   views       Int      @default(0)
 
   comments Comment[]
-  likes    Like[] // 👈 dodane pole relacji z Like
+  likes    Like[] // dodane pole relacji z Like
 
   @@index([createdAt])
 }
