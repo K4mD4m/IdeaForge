@@ -1,19 +1,155 @@
 'use client'
 
+import { useEffect, useState } from 'react'
 import { motion } from 'framer-motion'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
-import Link from 'next/link'
 import { useSession } from 'next-auth/react'
+
+// Simple type for Idea
+type Idea = {
+    id: string
+    title: string
+    description: string
+    category?: string | null
+    tags?: string[]
+    createdById?: string
+}
 
 export default function DashboardPage() {
     const { data: session } = useSession()
+    const userId = session?.user?.id ?? 'temp-user-id' // dev fallback
+
+    const [ideas, setIdeas] = useState<Idea[]>([])
+    const [loading, setLoading] = useState(false)
+    const [error, setError] = useState<string | null>(null)
+
+    // Modal states
+    const [editing, setEditing] = useState<Idea | null>(null)
+    const [creating, setCreating] = useState(false)
+    const [saving, setSaving] = useState(false)
+
+    // Form state
+    const [form, setForm] = useState({
+        title: '',
+        description: '',
+        category: '',
+    })
+
+    // Helper function to safely parse JSON responses
+    async function safeJson(res: Response) {
+        try {
+            return await res.json()
+        } catch {
+            return null
+        }
+    }
+
+    // Fetch ideas from API
+    async function fetchIdeas() {
+        setLoading(true)
+        setError(null)
+        try {
+            const res = await fetch('/api/ideas')
+            const data = await safeJson(res)
+            if (!res.ok) {
+                throw new Error(data?.error || 'Failed to fetch ideas')
+            }
+            if (!Array.isArray(data)) {
+                setIdeas([])
+            } else {
+                const my = (data as Idea[]).filter((i) => i.createdById === userId)
+                setIdeas(my)
+            }
+        } catch (err: any) {
+            setError(err.message || 'Unknown error')
+        } finally {
+            setLoading(false)
+        }
+    }
+
+    useEffect(() => {
+        fetchIdeas()
+    }, [userId])
+
+    // Delete
+    async function handleDelete(id: string) {
+        if (!confirm('Are you sure you want to delete this idea?')) return
+        try {
+            const res = await fetch(`/api/ideas/${id}`, { method: 'DELETE' })
+            const data = await safeJson(res)
+            if (!res.ok) throw new Error(data?.error || 'Delete failed')
+            setIdeas((prev) => prev.filter((p) => p.id !== id))
+        } catch (err: any) {
+            alert('Delete error: ' + (err.message || err))
+        }
+    }
+
+    // Save Create/Edit
+    async function saveIdea(e: React.FormEvent) {
+        e.preventDefault()
+        setSaving(true)
+        try {
+            const isEdit = !!editing
+            const url = isEdit ? `/api/ideas/${editing!.id}` : '/api/ideas'
+            const method = isEdit ? 'PUT' : 'POST'
+
+            const res = await fetch(url, {
+                method,
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    title: form.title,
+                    description: form.description,
+                    category: form.category || null,
+                    tags: [],
+                    published: false,
+                }),
+            })
+            const data = await safeJson(res)
+            if (!res.ok) throw new Error(data?.error || 'Save failed')
+
+            if (isEdit) {
+                setIdeas((prev) => prev.map((it) => (it.id === data.id ? data : it)))
+                setEditing(null)
+            } else {
+                setIdeas((prev) => [...prev, data])
+                setCreating(false)
+            }
+            setForm({ title: '', description: '', category: '' })
+        } catch (err: any) {
+            alert('Save error: ' + (err.message || err))
+        } finally {
+            setSaving(false)
+        }
+    }
+
+    // Open create modal
+    function openCreate() {
+        setForm({ title: '', description: '', category: '' })
+        setCreating(true)
+    }
+
+    // Open edit modal
+    function openEdit(idea: Idea) {
+        setForm({
+            title: idea.title,
+            description: idea.description,
+            category: idea.category ?? '',
+        })
+        setEditing(idea)
+    }
+
+    // Close modal
+    function closeModal() {
+        setCreating(false)
+        setEditing(null)
+    }
 
     return (
         <main className="min-h-screen bg-gradient-to-b from-[#0a0a0f] to-[#1a1a2e] text-white px-6 pt-28 pb-16">
             <div className="max-w-7xl mx-auto space-y-12">
-                {/* Profile Section */}
+                {/* Profile + CTA */}
                 <motion.div
                     initial={{ opacity: 0, y: -20 }}
                     animate={{ opacity: 1, y: 0 }}
@@ -24,65 +160,107 @@ export default function DashboardPage() {
                         <CardContent className="flex flex-col items-center md:items-start p-8">
                             <Avatar className="h-24 w-24 mb-4 ring-4 ring-purple-500/30">
                                 <AvatarImage src={session?.user?.image || ''} />
-                                <AvatarFallback>
-                                    {session?.user?.name?.charAt(0) || 'U'}
-                                </AvatarFallback>
+                                <AvatarFallback>{session?.user?.name?.charAt(0) || 'U'}</AvatarFallback>
                             </Avatar>
-                            <h2 className="text-2xl font-bold text-white tracking-tight">
-                                {session?.user?.name || 'User'}
-                            </h2>
-                            <p className="text-gray-400 text-sm mb-6">
-                                {session?.user?.email || 'No email provided'}
-                            </p>
-                            <Link href="/ideas/new" className="w-full md:w-auto">
-                                <Button className="w-full md:w-auto bg-purple-500 hover:bg-purple-600 text-white text-sm px-6 py-2 rounded-lg shadow-lg cursor-pointer">
-                                    Add Idea
-                                </Button>
-                            </Link>
+                            <h2 className="text-2xl text-white font-bold tracking-tight">{session?.user?.name || 'User'}</h2>
+                            <p className="text-gray-400 text-sm mb-6">{session?.user?.email || 'No email provided'}</p>
+                            <Button onClick={openCreate} className="w-full md:w-auto bg-purple-500 hover:bg-purple-600 text-white text-sm px-6 py-2 rounded-lg shadow-lg cursor-pointer">
+                                Add Idea
+                            </Button>
                         </CardContent>
                     </Card>
 
-                    {/* Greeting / Info */}
                     <div className="text-center md:text-left mt-8 md:mt-0 max-w-lg">
-                        <h1 className="text-3xl md:text-4xl font-bold mb-4">
-                            Welcome back, {session?.user?.name?.split(' ')[0] || 'Creator'}!
-                        </h1>
+                        <h1 className="text-3xl md:text-4xl font-bold mb-4">Welcome back, {session?.user?.name?.split(' ')[0] || 'Creator'}!</h1>
                         <p className="text-gray-400 leading-relaxed">
-                            Your personal hub for creating, managing, and sharing ideas.
-                            Add new projects, explore your creativity, and inspire others.
+                            Your personal hub for creating and managing ideas. Only you can see drafts here — publish them when ready.
                         </p>
                     </div>
                 </motion.div>
 
-                {/* My Ideas Section */}
-                <motion.section
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    transition={{ duration: 0.6, delay: 0.2 }}
-                >
-                    <h3 className="text-2xl font-bold mb-6">My Ideas</h3>
-                    <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-                        {/* Example Idea Card */}
-                        <Card className="bg-[#1f1f2e]/80 border border-white/5 shadow-lg hover:shadow-purple-500/10 transition">
-                            <CardContent className="p-6">
-                                <h4 className="text-lg font-semibold mb-2 text-white">Idea Title</h4>
-                                <p className="text-gray-400 text-sm mb-4">
-                                    Short description of the idea...
-                                </p>
-                                <div className="flex justify-between text-xs text-gray-500">
-                                    <span>Category</span>
-                                    <span>0 Likes</span>
-                                </div>
-                            </CardContent>
-                        </Card>
+                {/* My Ideas */}
+                <motion.section initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.6, delay: 0.2 }}>
+                    <div className="flex items-center justify-between mb-6">
+                        <h3 className="text-2xl font-bold">My Ideas</h3>
+                        <div className="text-sm text-gray-400">{loading ? 'Loading…' : `${ideas.length} ideas`}</div>
+                    </div>
 
-                        {/* Empty state */}
-                        <div className="col-span-full text-center text-gray-500 text-sm">
-                            No ideas yet. Click &quot;Add Idea&quot; to get started.
-                        </div>
+                    {error && <div className="mb-4 text-red-400">{error}</div>}
+
+                    <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                        {ideas.length === 0 && !loading ? (
+                            <div className="col-span-full text-center text-gray-500 text-sm">No ideas yet. Click "Add Idea" to get started.</div>
+                        ) : (
+                            ideas.map((idea) => (
+                                <Card key={idea.id} className="bg-[#1f1f2e]/80 border border-white/5 shadow-lg hover:shadow-purple-500/10 transition">
+                                    <CardContent className="p-6">
+                                        <div className="flex justify-between items-start mb-2">
+                                            <h4 className="text-lg text-white font-semibold">{idea.title}</h4>
+                                            <div className="flex items-center gap-2">
+                                                <Button size="sm" className='cursor-pointer' variant="outline" onClick={() => openEdit(idea)}>Edit</Button>
+                                                <Button size="sm" className='cursor-pointer' variant="destructive" onClick={() => handleDelete(idea.id)}>Delete</Button>
+                                            </div>
+                                        </div>
+                                        <p className="text-gray-400 text-sm mb-4 line-clamp-3">{idea.description}</p>
+                                        <div className="flex justify-between text-xs text-gray-500">
+                                            <span>{idea.category ?? 'No category'}</span>
+                                            <span>0 likes</span>
+                                        </div>
+                                    </CardContent>
+                                </Card>
+                            ))
+                        )}
                     </div>
                 </motion.section>
             </div>
+
+            {/* Modal for Create/Edit */}
+            {(creating || editing) && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+                    <motion.form
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: 20 }}
+                        transition={{ duration: 0.18 }}
+                        onSubmit={saveIdea}
+                        className="w-full max-w-2xl bg-[#0f1116] rounded-xl p-6 shadow-lg"
+                    >
+                        <h3 className="text-lg font-semibold mb-4">{editing ? 'Edit idea' : 'Add new idea'}</h3>
+
+                        <label className="block text-sm text-gray-300 mb-2">Title</label>
+                        <input
+                            className="w-full mb-3 rounded-md bg-[#1b1b26] border border-white/6 px-3 py-2 text-white"
+                            value={form.title}
+                            onChange={(e) => setForm({ ...form, title: e.target.value })}
+                            required
+                        />
+
+                        <label className="block text-sm text-gray-300 mb-2">Description</label>
+                        <textarea
+                            className="w-full mb-3 rounded-md bg-[#1b1b26] border border-white/6 px-3 py-2 text-white min-h-[120px]"
+                            value={form.description}
+                            onChange={(e) => setForm({ ...form, description: e.target.value })}
+                            required
+                        />
+
+                        <label className="block text-sm text-gray-300 mb-2">Category (optional)</label>
+                        <input
+                            className="w-full mb-4 rounded-md bg-[#1b1b26] border border-white/6 px-3 py-2 text-white"
+                            value={form.category}
+                            onChange={(e) => setForm({ ...form, category: e.target.value })}
+                        />
+
+                        <div className="flex gap-3 justify-end">
+                            <button type="button" className="px-4 py-2 rounded-md bg-gray-700 hover:bg-gray-600 text-sm cursor-pointer" onClick={closeModal} disabled={saving}>
+                                Cancel
+                            </button>
+                            <button type="submit" className="px-4 py-2 rounded-md bg-purple-500 hover:bg-purple-400 text-white cursor-pointer" disabled={saving}>
+                                {saving ? 'Saving…' : 'Save'}
+                            </button>
+                        </div>
+                    </motion.form>
+                </div>
+            )}
         </main>
     )
 }
