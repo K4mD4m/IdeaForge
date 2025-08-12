@@ -7,7 +7,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useSession } from "next-auth/react";
 
-// Simple type for Idea
+// Define the Idea type
 type Idea = {
   id: string;
   title: string;
@@ -15,26 +15,30 @@ type Idea = {
   category?: string | null;
   tags?: string[];
   createdById?: string;
+  published?: boolean;
 };
 
 export default function DashboardPage() {
   const { data: session } = useSession();
-  const userId = session?.user?.id ?? "temp-user-id"; // dev fallback
+  const userId = session?.user?.id ?? "temp-user-id";
+  const emailVerified = !!session?.user?.emailVerified;
 
+  // Define the state for ideas
   const [ideas, setIdeas] = useState<Idea[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Modal states
+  // Define the state for editing and creating ideas
   const [editing, setEditing] = useState<Idea | null>(null);
   const [creating, setCreating] = useState(false);
   const [saving, setSaving] = useState(false);
 
-  // Form state
+  // Define the state for the form inputs
   const [form, setForm] = useState({
     title: "",
     description: "",
     category: "",
+    published: false,
   });
 
   // Helper function to safely parse JSON responses
@@ -46,22 +50,16 @@ export default function DashboardPage() {
     }
   }
 
-  // Fetch ideas from API
+  // Fetch ideas from the server
   async function fetchIdeas() {
     setLoading(true);
     setError(null);
     try {
       const res = await fetch("/api/ideas");
       const data = await safeJson(res);
-      if (!res.ok) {
-        throw new Error(data?.error || "Failed to fetch ideas");
-      }
-      if (!Array.isArray(data)) {
-        setIdeas([]);
-      } else {
-        const my = (data as Idea[]).filter((i) => i.createdById === userId);
-        setIdeas(my);
-      }
+      if (!res.ok) throw new Error(data?.error || "Failed to fetch ideas");
+      const my = (data as Idea[]).filter((i) => i.createdById === userId);
+      setIdeas(my);
     } catch (err: any) {
       setError(err.message || "Unknown error");
     } finally {
@@ -73,7 +71,7 @@ export default function DashboardPage() {
     fetchIdeas();
   }, [userId]);
 
-  // Delete
+  // Handle idea delete
   async function handleDelete(id: string) {
     if (!confirm("Are you sure you want to delete this idea?")) return;
     try {
@@ -86,7 +84,7 @@ export default function DashboardPage() {
     }
   }
 
-  // Save Create/Edit
+  // Handle idea save
   async function saveIdea(e: React.FormEvent) {
     e.preventDefault();
     setSaving(true);
@@ -103,7 +101,7 @@ export default function DashboardPage() {
           description: form.description,
           category: form.category || null,
           tags: [],
-          published: false,
+          published: emailVerified ? form.published : false, // wymuszenie blokady
         }),
       });
       const data = await safeJson(res);
@@ -116,7 +114,7 @@ export default function DashboardPage() {
         setIdeas((prev) => [...prev, data]);
         setCreating(false);
       }
-      setForm({ title: "", description: "", category: "" });
+      setForm({ title: "", description: "", category: "", published: false });
     } catch (err: any) {
       alert("Save error: " + (err.message || err));
     } finally {
@@ -124,18 +122,19 @@ export default function DashboardPage() {
     }
   }
 
-  // Open create modal
+  // Open create idea modal
   function openCreate() {
-    setForm({ title: "", description: "", category: "" });
+    setForm({ title: "", description: "", category: "", published: false });
     setCreating(true);
   }
 
-  // Open edit modal
+  // Open edit idea modal
   function openEdit(idea: Idea) {
     setForm({
       title: idea.title,
       description: idea.description,
       category: idea.category ?? "",
+      published: idea.published ?? false,
     });
     setEditing(idea);
   }
@@ -149,7 +148,7 @@ export default function DashboardPage() {
   return (
     <main className="min-h-screen bg-gradient-to-b from-[#0a0a0f] to-[#1a1a2e] text-white px-6 pt-28 pb-16">
       <div className="max-w-7xl mx-auto space-y-12">
-        {/* Profile + CTA */}
+        {/* Profile */}
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -178,7 +177,6 @@ export default function DashboardPage() {
               </Button>
             </CardContent>
           </Card>
-
           <div className="text-center md:text-left mt-8 md:mt-0 max-w-lg">
             <h1 className="text-3xl md:text-4xl font-bold mb-4">
               Welcome back, {session?.user?.name?.split(" ")[0] || "Creator"}!
@@ -245,7 +243,7 @@ export default function DashboardPage() {
                     </p>
                     <div className="flex justify-between text-xs text-gray-500">
                       <span>{idea.category ?? "No category"}</span>
-                      <span>0 likes</span>
+                      <span>{idea.published ? "Published" : "Draft"}</span>
                     </div>
                   </CardContent>
                 </Card>
@@ -294,10 +292,25 @@ export default function DashboardPage() {
               Category (optional)
             </label>
             <input
-              className="w-full mb-4 rounded-md bg-[#1b1b26] border border-white/6 px-3 py-2 text-white"
+              className="w-full mb-4 rounded-md bg-[#1b1b26] border px-3 py-2"
               value={form.category}
               onChange={(e) => setForm({ ...form, category: e.target.value })}
             />
+
+            {/* Publish toggle */}
+            <div className="mb-4 flex items-center gap-2">
+              <input
+                type="checkbox"
+                checked={form.published}
+                disabled={!emailVerified}
+                onChange={(e) =>
+                  setForm({ ...form, published: e.target.checked })
+                }
+              />
+              <span className={!emailVerified ? "text-gray-500" : ""}>
+                Publish idea {!emailVerified && "(Verify email to enable)"}
+              </span>
+            </div>
 
             <div className="flex gap-3 justify-end">
               <button

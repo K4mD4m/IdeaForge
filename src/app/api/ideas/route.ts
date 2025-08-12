@@ -37,6 +37,12 @@ export async function POST(req: Request) {
       );
     }
 
+    // todo: user froem session (now example)
+    const currentUser = await prisma.user.findUnique({
+      where: { id: "temp-user-id" },
+    });
+    const canPublish = !!currentUser?.emailVerified;
+
     const slug = generateSlug(title);
 
     const newIdea = await prisma.idea.create({
@@ -46,8 +52,8 @@ export async function POST(req: Request) {
         description,
         category: category || null,
         tags: tags || [],
-        published: published ?? false,
-        createdById: "temp-user-id", // TODO: zamienić na ID zalogowanego usera
+        published: canPublish ? published : false,
+        createdById: currentUser?.id || "temp-user-id",
       },
     });
 

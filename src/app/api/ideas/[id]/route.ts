@@ -33,6 +33,11 @@ export async function PUT(
     const body = await req.json();
     const { title, description, category, tags, published } = body;
 
+    const currentUser = await prisma.user.findUnique({
+      where: { id: "temp-user-id" },
+    });
+    const canPublish = !!currentUser?.emailVerified;
+
     const updatedIdea = await prisma.idea.update({
       where: { id: params.id },
       data: {
@@ -40,7 +45,7 @@ export async function PUT(
         description,
         category: category || null,
         tags: tags || [],
-        published: published ?? false,
+        published: canPublish ? published : false,
       },
     });
 
