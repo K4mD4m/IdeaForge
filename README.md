@@ -1,1 +1,1 @@
-check github
+check github org/pers
