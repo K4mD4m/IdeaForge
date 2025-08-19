@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 
-// GET: single idea
+// GET: fetch single idea by id
 export async function GET(
   req: Request,
   { params }: { params: { id: string } },
@@ -24,7 +24,7 @@ export async function GET(
   }
 }
 
-// PUT: edit idea
+// PUT: update idea (only if belongs to current user)
 export async function PUT(
   req: Request,
   { params }: { params: { id: string } },
@@ -34,9 +34,17 @@ export async function PUT(
     const { title, description, category, tags, published } = body;
 
     const currentUser = await prisma.user.findUnique({
-      where: { id: "temp-user-id" },
+      where: { id: "temp-user-id" }, // TODO: replace with session user
     });
     const canPublish = !!currentUser?.emailVerified;
+
+    // Ensure idea belongs to the user
+    const idea = await prisma.idea.findUnique({
+      where: { id: params.id },
+    });
+    if (!idea || idea.createdById !== currentUser?.id) {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    }
 
     const updatedIdea = await prisma.idea.update({
       where: { id: params.id },
@@ -58,12 +66,23 @@ export async function PUT(
   }
 }
 
-// DELETE: delete idea
+// DELETE: delete idea (only if belongs to current user)
 export async function DELETE(
   req: Request,
   { params }: { params: { id: string } },
 ) {
   try {
+    const currentUser = await prisma.user.findUnique({
+      where: { id: "temp-user-id" }, // TODO: replace with session user
+    });
+
+    const idea = await prisma.idea.findUnique({
+      where: { id: params.id },
+    });
+    if (!idea || idea.createdById !== currentUser?.id) {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    }
+
     await prisma.idea.delete({
       where: { id: params.id },
     });
@@ -75,3 +94,4 @@ export async function DELETE(
     );
   }
 }
+

@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 
-// Slug generator
+// Slug generator helper
 function generateSlug(text: string) {
   return text
     .toLowerCase()
@@ -9,10 +9,12 @@ function generateSlug(text: string) {
     .replace(/(^-|-$)+/g, "");
 }
 
-// GET: all ideas
+// GET: fetch all ideas created by the current user (both drafts and published)
 export async function GET() {
   try {
+    const currentUserId = "temp-user-id"; // TODO: replace with session user
     const ideas = await prisma.idea.findMany({
+      where: { createdById: currentUserId },
       orderBy: { createdAt: "desc" },
     });
     return NextResponse.json(ideas);
@@ -24,7 +26,7 @@ export async function GET() {
   }
 }
 
-// POST: create idea
+// POST: create a new idea for the current user
 export async function POST(req: Request) {
   try {
     const body = await req.json();
@@ -37,13 +39,20 @@ export async function POST(req: Request) {
       );
     }
 
-    // todo: user froem session (now example)
     const currentUser = await prisma.user.findUnique({
-      where: { id: "temp-user-id" },
+      where: { id: "temp-user-id" }, // TODO: replace with session user
     });
+
     const canPublish = !!currentUser?.emailVerified;
 
-    const slug = generateSlug(title);
+    // Ensure slug uniqueness
+    let slug = generateSlug(title);
+    let exists = await prisma.idea.findUnique({ where: { slug } });
+    let counter = 1;
+    while (exists) {
+      slug = `${generateSlug(title)}-${counter++}`;
+      exists = await prisma.idea.findUnique({ where: { slug } });
+    }
 
     const newIdea = await prisma.idea.create({
       data: {
@@ -65,3 +74,4 @@ export async function POST(req: Request) {
     );
   }
 }
+
