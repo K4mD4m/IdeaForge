@@ -236,10 +236,12 @@ export default function HomePage() {
 
         <div className="relative max-w-5xl mx-auto">
           {/* Timeline line */}
-          <div className="absolute md:top-10 md:left-0 md:right-0 md:h-[2px] 
+          <div
+            className="absolute md:top-10 md:left-0 md:right-0 md:h-[2px] 
                           top-0 left-8 bottom-0 md:w-full w-[2px] 
                           bg-gradient-to-r md:from-purple-500 md:via-cyan-500 md:to-pink-500 
-                          from-purple-500 to-pink-500 opacity-70 rounded-full" />
+                          from-purple-500 to-pink-500 opacity-70 rounded-full"
+          />
 
           <div className="grid md:grid-cols-3 gap-16 relative">
             {[
@@ -270,8 +272,6 @@ export default function HomePage() {
                 viewport={{ once: true }}
                 className="relative flex md:flex-col items-start md:items-center text-left md:text-center"
               >
-
-
                 {/* Number circle */}
                 <div
                   className={`flex-shrink-0 w-14 h-14 flex items-center justify-center 
@@ -286,14 +286,15 @@ export default function HomePage() {
                   <h3 className="font-semibold text-lg md:text-xl text-white mb-2">
                     {step.title}
                   </h3>
-                  <p className="text-gray-300 text-sm md:text-base">{step.desc}</p>
+                  <p className="text-gray-300 text-sm md:text-base">
+                    {step.desc}
+                  </p>
                 </div>
               </motion.div>
             ))}
           </div>
         </div>
       </section>
-
 
       {/* Call To Action */}
       <motion.section
