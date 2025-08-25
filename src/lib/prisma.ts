@@ -1,6 +1,7 @@
 import { PrismaClient } from "@prisma/client";
 
 declare global {
+  // Prevent multiple instances of PrismaClient in dev
   var prisma: PrismaClient | undefined;
 }
 
@@ -10,4 +11,4 @@ export const prisma =
     log: ["query"],
   });
 
-if (process.env.NODE_ENV !== "production") global.prisma = prisma; // todo
+if (process.env.NODE_ENV !== "production") global.prisma = prisma;

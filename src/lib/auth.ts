@@ -4,14 +4,13 @@ import bcrypt from "bcrypt";
 import CredentialsProvider from "next-auth/providers/credentials";
 import GitHubProvider from "next-auth/providers/github";
 import GoogleProvider from "next-auth/providers/google";
-import { db } from "@/lib/db";
+import { prisma } from "@/lib/prisma";
 
-// Configuration object for NextAuth authentication
 export const authOptions: NextAuthOptions = {
-  // Use Prisma adapter to connect NextAuth to your Prisma database client
-  adapter: PrismaAdapter(db),
+  // Prisma adapter to connect NextAuth with Prisma DB
+  adapter: PrismaAdapter(prisma),
 
-  // List of authentication providers
+  // Authentication providers
   providers: [
     GitHubProvider({
       clientId: process.env.GITHUB_ID!,
@@ -30,14 +29,15 @@ export const authOptions: NextAuthOptions = {
       async authorize(credentials) {
         if (!credentials?.email || !credentials.password) return null;
 
-        // Explicitly select hashedPassword in the query
-        const user = await db.user.findUnique({
+        // Explicitly fetch hashedPassword + emailVerified
+        const user = await prisma.user.findUnique({
           where: { email: credentials.email },
           select: {
             id: true,
             email: true,
             name: true,
             hashedPassword: true,
+            emailVerified: true,
           },
         });
 
@@ -50,33 +50,34 @@ export const authOptions: NextAuthOptions = {
 
         if (!isValid) return null;
 
-        return { id: user.id, email: user.email, name: user.name };
+        return {
+          id: user.id,
+          email: user.email,
+          name: user.name,
+          emailVerified: user.emailVerified,
+        };
       },
     }),
   ],
 
-  // Session strategy - use JSON Web Tokens (JWT)
   session: {
     strategy: "jwt",
   },
 
-  // Callbacks to extend or customize NextAuth behavior
+  // Extend session and JWT with custom fields
   callbacks: {
-    session: async ({ session, token }) => {
-      try {
-        if (!session.user) {
-          throw new Error("No user object found in session");
-        }
-
-        // Attach the user ID from JWT token to the session user object
+    async session({ session, token }) {
+      if (session.user) {
         session.user.id = token.sub ?? "";
-
-        return session;
-      } catch (error) {
-        console.error("Error in session callback:", error);
-
-        return session;
+        session.user.emailVerified = token.emailVerified as Date | null;
       }
+      return session;
+    },
+    async jwt({ token, user }) {
+      if (user) {
+        token.emailVerified = (user as any).emailVerified ?? null;
+      }
+      return token;
     },
   },
 };
