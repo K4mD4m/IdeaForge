@@ -64,6 +64,11 @@ export const authOptions: NextAuthOptions = {
     strategy: "jwt",
   },
 
+  pages: {
+    signIn: "/login",
+    newUser: "/register", // na register po rejestracji
+  },
+
   // Extend session and JWT with custom fields
   callbacks: {
     async session({ session, token }) {
