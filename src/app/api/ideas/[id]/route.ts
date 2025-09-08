@@ -1,5 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { authOptions } from "@/lib/auth";
+import { getServerSession } from "next-auth";
 
 // GET: fetch single idea by id
 export async function GET(
@@ -30,11 +32,16 @@ export async function PUT(
   { params }: { params: { id: string } },
 ) {
   try {
+    const session = await getServerSession(authOptions);
+    if (!session?.user?.id) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
     const body = await req.json();
     const { title, description, category, tags, published } = body;
 
     const currentUser = await prisma.user.findUnique({
-      where: { id: "temp-user-id" }, // TODO: replace with session user
+      where: { id: session.user.id },
     });
     const canPublish = !!currentUser?.emailVerified;
 
@@ -42,7 +49,7 @@ export async function PUT(
     const idea = await prisma.idea.findUnique({
       where: { id: params.id },
     });
-    if (!idea || idea.createdById !== currentUser?.id) {
+    if (!idea || idea.createdById !== session.user.id) {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
@@ -72,14 +79,15 @@ export async function DELETE(
   { params }: { params: { id: string } },
 ) {
   try {
-    const currentUser = await prisma.user.findUnique({
-      where: { id: "temp-user-id" }, // TODO: replace with session user
-    });
+    const session = await getServerSession(authOptions);
+    if (!session?.user?.id) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
 
     const idea = await prisma.idea.findUnique({
       where: { id: params.id },
     });
-    if (!idea || idea.createdById !== currentUser?.id) {
+    if (!idea || idea.createdById !== session.user.id) {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
