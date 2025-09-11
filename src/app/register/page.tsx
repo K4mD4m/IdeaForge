@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { motion } from "framer-motion";
 import { signIn } from "next-auth/react";
 import { Mail, Lock, User, Github, Chrome } from "lucide-react";
@@ -13,8 +13,9 @@ export default function RegisterPage() {
   const [error, setError] = useState(""); // State for error
   const [loading, setLoading] = useState(false); // State for loading
 
-  // Router for navigation
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const callbackUrl = searchParams.get("callbackUrl") || "/dashboard";
 
   // Handle form submission
   async function handleSubmit(e: React.FormEvent) {
@@ -32,7 +33,7 @@ export default function RegisterPage() {
 
       // Check response
       if (res.ok) {
-        router.push("/login");
+        router.push(`/login?callbackUrl=${encodeURIComponent(callbackUrl)}`);
       } else {
         const data = await res.json();
         setError(data.error || "Registration failed");
