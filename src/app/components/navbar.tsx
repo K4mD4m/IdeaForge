@@ -48,15 +48,15 @@ export const Navbar = () => {
               Login
             </Button>
           ) : (
-            <Avatar
-              className="h-9 w-9 cursor-pointer"
-              onClick={() => signOut()}
+            <Button
+              variant="ghost"
+              className="text-gray-400 hover:text-red-400 hover:bg-red-500/10 transition cursor-pointer"
+              onClick={() => {
+                signOut();
+              }}
             >
-              <AvatarImage src={session.user?.image ?? ""} />
-              <AvatarFallback>
-                {session.user?.name?.charAt(0) ?? "U"}
-              </AvatarFallback>
-            </Avatar>
+              Logout
+            </Button>
           )}
         </div>
 
