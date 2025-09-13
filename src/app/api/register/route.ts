@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
 import bcrypt from "bcrypt";
 import { prisma } from "@/lib/prisma";
+import { randomUUID } from "crypto";
+import { sendVerificationEmail } from "@/lib/email";
 
 export async function POST(req: Request) {
   // Register new user
@@ -32,6 +34,19 @@ export async function POST(req: Request) {
         hashedPassword,
       },
     });
+
+    // Generate verification token
+    const token = randomUUID();
+    await prisma.verificationToken.create({
+      data: {
+        identifier: email,
+        token,
+        expires: new Date(Date.now() + 1000 * 60 * 60 * 24), // 24h
+      },
+    });
+
+    // Send verification email
+    await sendVerificationEmail(email, token);
 
     return NextResponse.json({ user });
   } catch (err) {
