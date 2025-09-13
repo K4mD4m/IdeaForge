@@ -48,6 +48,28 @@ export default function IdeasWall() {
     }
   }
 
+  const sortedIdeas = (() => {
+    if (activeFilter === "popularity" && activePopularity === "most-liked") {
+      // Sort by upvotes descending
+      return [...ideas].sort((a, b) => (b.upvotes ?? 0) - (a.upvotes ?? 0));
+    }
+    if (
+      activeFilter === "popularity" &&
+      activePopularity === "most-commented"
+    ) {
+      // Sort by commentsCount descending
+      return [...ideas].sort(
+        (a, b) => (b.commentsCount ?? 0) - (a.commentsCount ?? 0),
+      );
+    }
+    if (activeFilter === "category" && activeCategory) {
+      // Filter by category
+      return ideas.filter((idea) => idea.category === activeCategory);
+    }
+    // Default: no sorting/filtering
+    return ideas;
+  })();
+
   useEffect(() => {
     async function fetchIdeas() {
       setLoading(true);
@@ -124,12 +146,12 @@ export default function IdeasWall() {
         </div>
       ) : (
         <section className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-          {ideas.length === 0 ? (
+          {sortedIdeas.length === 0 ? (
             <p className="col-span-full text-center text-gray-500">
               No ideas found.
             </p>
           ) : (
-            ideas.map((idea) => (
+            sortedIdeas.map((idea) => (
               <motion.article
                 key={idea.id}
                 initial={{ opacity: 0, y: 15 }}
