@@ -3,7 +3,7 @@ import { Resend } from "resend";
 export const resend = new Resend(process.env.RESEND_API_KEY!);
 
 export async function sendVerificationEmail(email: string, token: string) {
-  const confirmUrl = `${process.env.NEXT_PUBLIC_APP_URL}/api/auth/verify?token=${token}`;
+  const confirmUrl = `${process.env.NEXT_PUBLIC_APP_URL}/api/verify?token=${token}`;
 
   await resend.emails.send({
     from: "onboarding@resend.dev", // todo: change to domain
