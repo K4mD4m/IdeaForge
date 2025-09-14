@@ -48,9 +48,9 @@ export default function TermsPage() {
             4. Disclaimer & Limitation of Liability
           </h2>
           <p>
-            IdeaForge is provided "as is" without any warranties. We are not
-            responsible for any damages arising from the use of our services,
-            including loss of data or content.
+            IdeaForge is provided &quot;as is&quot; without any warranties. We
+            are not responsible for any damages arising from the use of our
+            services, including loss of data or content.
           </p>
 
           <h2 className="text-2xl font-semibold">5. Changes to the Terms</h2>

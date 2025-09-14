@@ -51,7 +51,7 @@ export default function PrivacyPolicyPage() {
           <p>
             We use cookies to store preferences, enable core functionality, and
             analyze usage. You can disable cookies in your browser settings, but
-            this may affect the platform's functionality.
+            this may affect the platform&apos;s functionality.
           </p>
 
           <h2 className="text-2xl font-semibold">6. Your Rights</h2>

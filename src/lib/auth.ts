@@ -5,6 +5,7 @@ import CredentialsProvider from "next-auth/providers/credentials";
 import GitHubProvider from "next-auth/providers/github";
 import GoogleProvider from "next-auth/providers/google";
 import { prisma } from "@/lib/prisma";
+import type { User } from "@prisma/client";
 
 export const authOptions: NextAuthOptions = {
   // Prisma adapter to connect NextAuth with Prisma DB
@@ -80,7 +81,7 @@ export const authOptions: NextAuthOptions = {
     },
     async jwt({ token, user }) {
       if (user) {
-        token.emailVerified = (user as any).emailVerified ?? null;
+        token.emailVerified = (user as User).emailVerified ?? null;
       }
       return token;
     },

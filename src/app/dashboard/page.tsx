@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { motion } from "framer-motion";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Card, CardContent } from "@/components/ui/card";
@@ -50,8 +50,8 @@ export default function DashboardPage() {
     }
   }
 
-  // Fetch ideas from the server
-  async function fetchIdeas() {
+  // Fetch ideas from the server (fixed)
+  const fetchIdeas = useCallback(async () => {
     setLoading(true);
     setError(null);
     try {
@@ -60,16 +60,16 @@ export default function DashboardPage() {
       if (!res.ok) throw new Error(data?.error || "Failed to fetch ideas");
       const my = (data as Idea[]).filter((i) => i.createdById === userId);
       setIdeas(my);
-    } catch (err: any) {
-      setError(err.message || "Unknown error");
+    } catch (err: unknown) {
+      setError((err as Error).message || "Unknown error");
     } finally {
       setLoading(false);
     }
-  }
+  }, [userId]);
 
   useEffect(() => {
     fetchIdeas();
-  }, [userId]);
+  }, [fetchIdeas]);
 
   // Handle idea delete
   async function handleDelete(id: string) {
@@ -79,8 +79,8 @@ export default function DashboardPage() {
       const data = await safeJson(res);
       if (!res.ok) throw new Error(data?.error || "Delete failed");
       setIdeas((prev) => prev.filter((p) => p.id !== id));
-    } catch (err: any) {
-      alert("Delete error: " + (err.message || err));
+    } catch (err: unknown) {
+      alert("Delete error: " + (err as Error).message || err);
     }
   }
 
@@ -115,8 +115,8 @@ export default function DashboardPage() {
         setCreating(false);
       }
       setForm({ title: "", description: "", category: "", published: false });
-    } catch (err: any) {
-      alert("Save error: " + (err.message || err));
+    } catch (err: unknown) {
+      alert("Save error: " + (err as Error).message || err);
     } finally {
       setSaving(false);
     }
@@ -206,7 +206,7 @@ export default function DashboardPage() {
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {ideas.length === 0 && !loading ? (
               <div className="col-span-full text-center text-gray-500 text-sm">
-                No ideas yet. Click "Add Idea" to get started.
+                No ideas yet. Click &quot;Add Idea&quot; to get started.
               </div>
             ) : (
               ideas.map((idea) => (
