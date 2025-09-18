@@ -4,12 +4,9 @@ import { authOptions } from "@/lib/auth";
 import { getServerSession } from "next-auth";
 
 // GET: fetch single idea by id
-export async function GET(
-  req: Request,
-  context: { params: Record<string, string> },
-) {
+export async function GET(req: Request, { params }: any) {
   try {
-    const { id } = context.params;
+    const { id } = params;
 
     const idea = await prisma.idea.findUnique({
       where: { id },
@@ -30,12 +27,9 @@ export async function GET(
 }
 
 // PUT: update idea (only if belongs to current user)
-export async function PUT(
-  req: Request,
-  context: { params: Record<string, string> },
-) {
+export async function PUT(req: Request, { params }: any) {
   try {
-    const { id } = context.params;
+    const { id } = params;
     const session = await getServerSession(authOptions);
 
     if (!session?.user?.id) {
@@ -77,12 +71,9 @@ export async function PUT(
 }
 
 // DELETE: delete idea (only if belongs to current user)
-export async function DELETE(
-  req: Request,
-  context: { params: Record<string, string> },
-) {
+export async function DELETE(req: Request, { params }: any) {
   try {
-    const { id } = context.params;
+    const { id } = params;
     const session = await getServerSession(authOptions);
 
     if (!session?.user?.id) {
