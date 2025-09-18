@@ -6,11 +6,13 @@ import { getServerSession } from "next-auth";
 // GET: fetch single idea by id
 export async function GET(
   req: Request,
-  { params }: { params: { id: string } }
+  context: { params: Record<string, string> },
 ) {
   try {
+    const { id } = context.params;
+
     const idea = await prisma.idea.findUnique({
-      where: { id: params.id },
+      where: { id },
     });
 
     if (!idea) {
@@ -19,6 +21,7 @@ export async function GET(
 
     return NextResponse.json(idea);
   } catch (error) {
+    console.error(error);
     return NextResponse.json(
       { error: "Failed to fetch idea" },
       { status: 500 },
@@ -29,10 +32,12 @@ export async function GET(
 // PUT: update idea (only if belongs to current user)
 export async function PUT(
   req: Request,
-  { params }: { params: { id: string } }
+  context: { params: Record<string, string> },
 ) {
   try {
+    const { id } = context.params;
     const session = await getServerSession(authOptions);
+
     if (!session?.user?.id) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
@@ -45,16 +50,13 @@ export async function PUT(
     });
     const canPublish = !!currentUser?.emailVerified;
 
-    // Ensure idea belongs to the user
-    const idea = await prisma.idea.findUnique({
-      where: { id: params.id },
-    });
+    const idea = await prisma.idea.findUnique({ where: { id } });
     if (!idea || idea.createdById !== session.user.id) {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
     const updatedIdea = await prisma.idea.update({
-      where: { id: params.id },
+      where: { id },
       data: {
         title,
         description,
@@ -66,6 +68,7 @@ export async function PUT(
 
     return NextResponse.json(updatedIdea);
   } catch (error) {
+    console.error(error);
     return NextResponse.json(
       { error: "Failed to update idea" },
       { status: 500 },
@@ -76,26 +79,25 @@ export async function PUT(
 // DELETE: delete idea (only if belongs to current user)
 export async function DELETE(
   req: Request,
-  { params }: { params: { id: string } }
+  context: { params: Record<string, string> },
 ) {
   try {
+    const { id } = context.params;
     const session = await getServerSession(authOptions);
+
     if (!session?.user?.id) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const idea = await prisma.idea.findUnique({
-      where: { id: params.id },
-    });
+    const idea = await prisma.idea.findUnique({ where: { id } });
     if (!idea || idea.createdById !== session.user.id) {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
-    await prisma.idea.delete({
-      where: { id: params.id },
-    });
+    await prisma.idea.delete({ where: { id } });
     return NextResponse.json({ message: "Idea deleted successfully" });
   } catch (error) {
+    console.error(error);
     return NextResponse.json(
       { error: "Failed to delete idea" },
       { status: 500 },
