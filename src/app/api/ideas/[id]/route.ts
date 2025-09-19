@@ -3,8 +3,10 @@ import { prisma } from "@/lib/prisma";
 import { authOptions } from "@/lib/auth";
 import { getServerSession } from "next-auth";
 
+type Params = { params: { id: string } };
+
 // GET: fetch single idea by id
-export async function GET(req: Request, { params }: any) {
+export async function GET(req: Request, { params }: Params) {
   try {
     const { id } = params;
 
@@ -27,7 +29,7 @@ export async function GET(req: Request, { params }: any) {
 }
 
 // PUT: update idea (only if belongs to current user)
-export async function PUT(req: Request, { params }: any) {
+export async function PUT(req: Request, { params }: Params) {
   try {
     const { id } = params;
     const session = await getServerSession(authOptions);
@@ -71,7 +73,7 @@ export async function PUT(req: Request, { params }: any) {
 }
 
 // DELETE: delete idea (only if belongs to current user)
-export async function DELETE(req: Request, { params }: any) {
+export async function DELETE(req: Request, { params }: Params) {
   try {
     const { id } = params;
     const session = await getServerSession(authOptions);
