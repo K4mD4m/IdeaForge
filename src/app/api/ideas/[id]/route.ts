@@ -1,12 +1,13 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { authOptions } from "@/lib/auth";
 import { getServerSession } from "next-auth";
 
-type Params = { params: { id: string } };
 
 // GET: fetch single idea by id
-export async function GET(req: Request, { params }: Params) {
+export async function GET(req: Request, { params }: any) {
   try {
     const { id } = params;
 
@@ -29,7 +30,7 @@ export async function GET(req: Request, { params }: Params) {
 }
 
 // PUT: update idea (only if belongs to current user)
-export async function PUT(req: Request, { params }: Params) {
+export async function PUT(req: Request, { params }: any) {
   try {
     const { id } = params;
     const session = await getServerSession(authOptions);
@@ -73,7 +74,7 @@ export async function PUT(req: Request, { params }: Params) {
 }
 
 // DELETE: delete idea (only if belongs to current user)
-export async function DELETE(req: Request, { params }: Params) {
+export async function DELETE(req: Request, { params }: any) {
   try {
     const { id } = params;
     const session = await getServerSession(authOptions);
