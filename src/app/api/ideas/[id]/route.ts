@@ -5,7 +5,6 @@ import { prisma } from "@/lib/prisma";
 import { authOptions } from "@/lib/auth";
 import { getServerSession } from "next-auth";
 
-
 // GET: fetch single idea by id
 export async function GET(req: Request, { params }: any) {
   try {
