@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import { useSession, signIn, signOut } from "next-auth/react";
+import { useSession, signOut } from "next-auth/react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Menu, X } from "lucide-react";
@@ -40,12 +40,11 @@ export const Navbar = () => {
             </Link>
           ))}
           {!session ? (
-            <Button
-              className="bg-gradient-to-r from-purple-500 to-cyan-500 text-white hover:opacity-90 transition cursor-pointer"
-              onClick={() => signIn()}
-            >
-              Login
-            </Button>
+            <Link href="/login">
+              <Button className="bg-gradient-to-r from-purple-500 to-cyan-500 text-white hover:opacity-90 transition cursor-pointer">
+                Login
+              </Button>
+            </Link>
           ) : (
             <Button
               variant="ghost"
@@ -92,15 +91,16 @@ export const Navbar = () => {
                 </Link>
               ))}
               {!session ? (
-                <Button
-                  className="bg-gradient-to-r from-purple-500 to-cyan-500 text-white hover:opacity-90 transition"
-                  onClick={() => {
-                    signIn();
-                    setMobileOpen(false);
-                  }}
-                >
-                  Login
-                </Button>
+                <Link href="/login">
+                  <Button
+                    className="bg-gradient-to-r from-purple-500 to-cyan-500 text-white hover:opacity-90 transition"
+                    onClick={() => {
+                      setMobileOpen(false);
+                    }}
+                  >
+                    Login
+                  </Button>
+                </Link>
               ) : (
                 <Button
                   className="bg-red-500 hover:bg-red-600 text-white transition"
