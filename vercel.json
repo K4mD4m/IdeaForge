@@ -1,8 +1,11 @@
 {
   "rewrites": [
     {
-      "source": "/(.*)",
+      "source": "/((?!api).*)",
       "destination": "/"
     }
-  ]
+  ],
+  "error": {
+    "notFound": "/404"
+  }
 }

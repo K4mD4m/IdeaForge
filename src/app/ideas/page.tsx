@@ -202,9 +202,10 @@ function FilterButton({
       whileHover={{ scale: 1.1 }}
       whileTap={{ scale: 0.95 }}
       className={`px-4 py-1.5 rounded-full border text-sm font-semibold transition-colors duration-300 select-none
-        ${active
-          ? "bg-purple-600 text-white border-purple-600 shadow-lg shadow-purple-600/50"
-          : "bg-transparent text-gray-400 border-gray-600 hover:bg-purple-700 hover:text-white"
+        ${
+          active
+            ? "bg-purple-600 text-white border-purple-600 shadow-lg shadow-purple-600/50"
+            : "bg-transparent text-gray-400 border-gray-600 hover:bg-purple-700 hover:text-white"
         }`}
       aria-pressed={active}
       type="button"
