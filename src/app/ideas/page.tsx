@@ -105,7 +105,7 @@ export default function IdeasWall() {
         </FilterButton>
 
         {/* Popularity group */}
-        <div className="flex items-center space-x-2 whitespace-nowrap">
+        {/* <div className="flex items-center space-x-2 whitespace-nowrap">
           <span className="text-gray-400 uppercase tracking-widest text-xs font-semibold select-none">
             Popularity:
           </span>
@@ -118,7 +118,7 @@ export default function IdeasWall() {
               {label}
             </FilterButton>
           ))}
-        </div>
+        </div> */}
 
         {/* Categories group */}
         <div className="flex items-center space-x-2 whitespace-nowrap">
@@ -173,10 +173,10 @@ export default function IdeasWall() {
                   <span className="uppercase bg-purple-700/20 rounded-full px-3 py-1 select-none whitespace-nowrap">
                     {idea.category ?? "Uncategorized"}
                   </span>
-                  <div className="flex gap-4">
+                  {/* <div className="flex gap-4">
                     <Stat icon="👍" label={`${idea.upvotes ?? 0}`} />
                     <Stat icon="💬" label={`${idea.commentsCount ?? 0}`} />
-                  </div>
+                  </div> */}
                 </div>
               </motion.article>
             ))
@@ -202,10 +202,9 @@ function FilterButton({
       whileHover={{ scale: 1.1 }}
       whileTap={{ scale: 0.95 }}
       className={`px-4 py-1.5 rounded-full border text-sm font-semibold transition-colors duration-300 select-none
-        ${
-          active
-            ? "bg-purple-600 text-white border-purple-600 shadow-lg shadow-purple-600/50"
-            : "bg-transparent text-gray-400 border-gray-600 hover:bg-purple-700 hover:text-white"
+        ${active
+          ? "bg-purple-600 text-white border-purple-600 shadow-lg shadow-purple-600/50"
+          : "bg-transparent text-gray-400 border-gray-600 hover:bg-purple-700 hover:text-white"
         }`}
       aria-pressed={active}
       type="button"
