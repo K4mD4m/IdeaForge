@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState, useCallback } from "react";
+import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Card, CardContent } from "@/components/ui/card";
@@ -19,9 +20,17 @@ type Idea = {
 };
 
 export default function DashboardPage() {
-  const { data: session } = useSession();
-  const userId = session?.user?.id ?? "temp-user-id";
+  const router = useRouter();
+  const { data: session, status } = useSession();
+  const userId = session?.user?.id ?? "";
   const emailVerified = !!session?.user?.emailVerified;
+
+  // Redirect unauthenticated users to login
+  useEffect(() => {
+    if (status === "unauthenticated") {
+      router.replace("/login");
+    }
+  }, [status, router]);
 
   // Define the state for ideas
   const [ideas, setIdeas] = useState<Idea[]>([]);
