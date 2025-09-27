@@ -120,20 +120,27 @@ export default function IdeasWall() {
           ))}
         </div> */}
 
+        {/* Categories label: block on mobile, inline on md+ */}
+        <span className="w-full block md:hidden text-gray-400 uppercase tracking-widest text-xs font-semibold select-none text-center mt-2">
+          Categories:
+        </span>
+
         {/* Categories group */}
-        <div className="flex items-center space-x-2 whitespace-nowrap">
-          <span className="text-gray-400 uppercase tracking-widest text-xs font-semibold select-none">
+        <div className="flex flex-col md:flex-row items-center md:space-x-2 gap-2 whitespace-nowrap w-full md:w-auto justify-center md:justify-start">
+          <span className="hidden md:inline-block text-gray-400 uppercase tracking-widest text-xs font-semibold select-none">
             Categories:
           </span>
-          {categories.map((cat) => (
-            <FilterButton
-              key={cat}
-              active={activeFilter === "category" && activeCategory === cat}
-              onClick={() => handleSelectFilter("category", cat)}
-            >
-              {cat}
-            </FilterButton>
-          ))}
+          <div className="flex flex-wrap gap-2 w-full md:w-auto justify-center md:justify-start">
+            {categories.map((cat) => (
+              <FilterButton
+                key={cat}
+                active={activeFilter === "category" && activeCategory === cat}
+                onClick={() => handleSelectFilter("category", cat)}
+              >
+                {cat}
+              </FilterButton>
+            ))}
+          </div>
         </div>
       </motion.div>
 
@@ -202,10 +209,9 @@ function FilterButton({
       whileHover={{ scale: 1.1 }}
       whileTap={{ scale: 0.95 }}
       className={`px-4 py-1.5 rounded-full border text-sm font-semibold transition-colors duration-300 select-none
-        ${
-          active
-            ? "bg-purple-600 text-white border-purple-600 shadow-lg shadow-purple-600/50"
-            : "bg-transparent text-gray-400 border-gray-600 hover:bg-purple-700 hover:text-white"
+        ${active
+          ? "bg-purple-600 text-white border-purple-600 shadow-lg shadow-purple-600/50"
+          : "bg-transparent text-gray-400 border-gray-600 hover:bg-purple-700 hover:text-white"
         }`}
       aria-pressed={active}
       type="button"

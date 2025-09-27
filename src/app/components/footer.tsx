@@ -67,7 +67,7 @@ export default function Footer() {
           </div>
 
           {/* Newsletter */}
-          <div>
+          {/* <div>
             <h4 className="text-sm font-semibold tracking-wider uppercase text-gray-300">
               Stay in the loop
             </h4>
@@ -100,7 +100,7 @@ export default function Footer() {
               <FooterLink href="/terms">Terms</FooterLink> and{" "}
               <FooterLink href="/privacy">Privacy Policy</FooterLink>.
             </p>
-          </div>
+          </div> */}
         </div>
 
         <Separator className="my-8 bg-white/10" />
@@ -116,16 +116,10 @@ export default function Footer() {
             <FooterLink href="/privacy">Privacy</FooterLink>
             <div className="h-4 w-px bg-white/10" aria-hidden="true" />
             <div className="flex items-center gap-3">
-              <IconLink href="https://github.com" label="GitHub">
+              <IconLink href="https://github.com/K4mD4m" label="GitHub">
                 <Github className="h-4 w-4" />
               </IconLink>
-              <IconLink href="https://twitter.com" label="Twitter / X">
-                <Twitter className="h-4 w-4" />
-              </IconLink>
-              <IconLink href="https://linkedin.com" label="LinkedIn">
-                <Linkedin className="h-4 w-4" />
-              </IconLink>
-              <IconLink href="mailto:hello@ideaforge.app" label="Email">
+              <IconLink href="mailto:ideaforgesm@gmail.com" label="Email">
                 <Mail className="h-4 w-4" />
               </IconLink>
             </div>

@@ -311,7 +311,7 @@ export default function HomePage() {
           Join now and start building with a community that believes in your
           vision.
         </p>
-        <Link href="/submit">
+        <Link href="/register">
           <Button
             size="lg"
             className="bg-purple-500 hover:bg-purple-600 text-white cursor-pointer px-8 py-4 text-lg rounded-2xl shadow-xl"
