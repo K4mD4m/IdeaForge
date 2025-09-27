@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import bcrypt from "bcrypt";
 import { prisma } from "@/lib/prisma";
 import { randomUUID } from "crypto";
-import { sendVerificationEmail } from "@/lib/email";
+import { sendVerificationEmail } from "@/lib/mail";
 
 export async function POST(req: Request) {
   // Register new user
@@ -46,7 +46,7 @@ export async function POST(req: Request) {
     });
 
     // Send verification email
-    await sendVerificationEmail(email, token);
+    await sendVerificationEmail(user.email, token);
 
     return NextResponse.json({ user });
   } catch (err) {
