@@ -1,8 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { useSession } from "next-auth/react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useState } from "react";
 import { signIn } from "next-auth/react";
 import { motion } from "framer-motion";
 import { Github, Chrome } from "lucide-react";
@@ -11,16 +9,6 @@ export default function LoginForm() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
-  const router = useRouter();
-  const searchParams = useSearchParams();
-  const callbackUrl = searchParams.get("callbackUrl") || "/dashboard";
-  const { data: session, status } = useSession();
-
-  useEffect(() => {
-    if (status === "authenticated") {
-      router.push(callbackUrl);
-    }
-  }, [status, router, callbackUrl]);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -30,13 +18,13 @@ export default function LoginForm() {
       redirect: false,
       email,
       password,
-      callbackUrl,
+      callbackUrl: "/dashboard",
     });
 
     if (res?.error) {
       setError("Invalid email or password");
-    } else if (res?.ok) {
-      router.push(callbackUrl);
+    } else if (res?.ok && res.url) {
+      window.location.href = res.url;
     }
   }
 
@@ -88,13 +76,13 @@ export default function LoginForm() {
             provider="google"
             icon={<Chrome className="mr-2" />}
             label="Google"
-            callbackUrl={callbackUrl}
+            callbackUrl="/dashboard"
           />
           <SocialButton
             provider="github"
             icon={<Github className="mr-2" />}
             label="GitHub"
-            callbackUrl={callbackUrl}
+            callbackUrl="/dashboard"
           />
         </div>
 
