@@ -8,8 +8,11 @@ import { prisma } from "@/lib/prisma";
 import type { User } from "@prisma/client";
 
 export const authOptions: NextAuthOptions = {
-  // Prisma adapter to connect NextAuth with Prisma DB
+  // Prisma adapter
   adapter: PrismaAdapter(prisma),
+
+  // SECRET (konieczne w produkcji)
+  secret: process.env.NEXTAUTH_SECRET,
 
   // Authentication providers
   providers: [
@@ -30,7 +33,6 @@ export const authOptions: NextAuthOptions = {
       async authorize(credentials) {
         if (!credentials?.email || !credentials.password) return null;
 
-        // Explicitly fetch hashedPassword + emailVerified
         const user = await prisma.user.findUnique({
           where: { email: credentials.email },
           select: {
@@ -67,11 +69,15 @@ export const authOptions: NextAuthOptions = {
 
   pages: {
     signIn: "/login",
-    newUser: "/register", // na register po rejestracji
+    newUser: "/register",
+    error: "/login", // in case of error NextAuth will go to login
   },
 
-  // Extend session and JWT with custom fields
   callbacks: {
+    async redirect({ url, baseUrl }) {
+      // after login redirect to dashboard
+      return "/dashboard";
+    },
     async session({ session, token }) {
       if (session.user) {
         session.user.id = token.sub ?? "";
