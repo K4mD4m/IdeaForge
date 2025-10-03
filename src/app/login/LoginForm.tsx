@@ -76,13 +76,11 @@ export default function LoginForm() {
             provider="google"
             icon={<Chrome className="mr-2" />}
             label="Google"
-            callbackUrl="/dashboard"
           />
           <SocialButton
             provider="github"
             icon={<Github className="mr-2" />}
             label="GitHub"
-            callbackUrl="/dashboard"
           />
         </div>
 
@@ -114,18 +112,16 @@ function SocialButton({
   provider,
   icon,
   label,
-  callbackUrl,
 }: {
   provider: "google" | "github";
   icon: React.ReactNode;
   label: string;
-  callbackUrl: string;
 }) {
   return (
     <motion.button
       whileHover={{ scale: 1.02 }}
       whileTap={{ scale: 0.95 }}
-      onClick={() => signIn(provider, { callbackUrl })}
+      onClick={() => signIn(provider, { callbackUrl: "/dashboard" })}
       type="button"
       className="flex items-center justify-center bg-[#12121c] border border-white/10 rounded-lg py-2.5 text-sm font-medium hover:bg-[#1f1f2e] transition cursor-pointer"
     >

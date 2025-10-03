@@ -101,13 +101,13 @@ export default function RegisterForm() {
 
         <div className="flex flex-col gap-3">
           <SocialButton
-            onClick={() => signIn("google", { callbackUrl })}
+            onClick={() => signIn("google", { callbackUrl: "/dashboard" })}
             icon={<Chrome className="w-5 h-5" />}
             text="Continue with Google"
             color="bg-gray-800 hover:bg-gray-900 cursor-pointer"
           />
           <SocialButton
-            onClick={() => signIn("github", { callbackUrl })}
+            onClick={() => signIn("github", { callbackUrl: "/dashboard" })}
             icon={<Github className="w-5 h-5" />}
             text="Continue with GitHub"
             color="bg-gray-800 hover:bg-gray-900 cursor-pointer"
