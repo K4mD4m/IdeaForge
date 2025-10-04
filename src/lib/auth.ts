@@ -10,8 +10,6 @@ import type { User } from "@prisma/client";
 export const authOptions: NextAuthOptions = {
   // Prisma adapter
   adapter: PrismaAdapter(prisma),
-
-  // SECRET (konieczne w produkcji)
   secret: process.env.NEXTAUTH_SECRET,
 
   // Authentication providers
@@ -35,30 +33,18 @@ export const authOptions: NextAuthOptions = {
 
         const user = await prisma.user.findUnique({
           where: { email: credentials.email },
-          select: {
-            id: true,
-            email: true,
-            name: true,
-            hashedPassword: true,
-            emailVerified: true,
-          },
         });
 
         if (!user || !user.hashedPassword) return null;
 
         const isValid = await bcrypt.compare(
           credentials.password,
-          user.hashedPassword,
+          user.hashedPassword
         );
 
         if (!isValid) return null;
 
-        return {
-          id: user.id,
-          email: user.email,
-          name: user.name,
-          emailVerified: user.emailVerified,
-        };
+        return user;
       },
     }),
   ],
@@ -76,7 +62,7 @@ export const authOptions: NextAuthOptions = {
   callbacks: {
     async redirect({ url, baseUrl }) {
       // after login redirect to dashboard
-      return "/dashboard";
+      return `${baseUrl}/dashboard`;
     },
     async session({ session, token }) {
       if (session.user) {

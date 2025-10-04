@@ -15,7 +15,7 @@ export default function LoginForm() {
     setError("");
 
     const res = await signIn("credentials", {
-      redirect: false,
+      redirect: true,
       email,
       password,
       callbackUrl: "/dashboard",
@@ -23,8 +23,6 @@ export default function LoginForm() {
 
     if (res?.error) {
       setError("Invalid email or password");
-    } else if (res?.ok && res.url) {
-      window.location.href = res.url;
     }
   }
 
