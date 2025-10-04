@@ -10,16 +10,22 @@ export async function GET(req: Request) {
       return NextResponse.redirect(new URL("/verified?status=error", req.url));
     }
 
-    const dbToken = await prisma.verificationToken.findUnique({
+    // Search for the token in the database
+    const dbToken = await prisma.verificationToken.findFirst({
       where: { token },
     });
 
-    // token not found or expired -> error (and delete expired token to keep table clean)
     if (!dbToken || dbToken.expires.getTime() < Date.now()) {
       if (dbToken) {
-        // clean up expired token
         try {
-          await prisma.verificationToken.delete({ where: { token } });
+          await prisma.verificationToken.delete({
+            where: {
+              identifier_token: {
+                identifier: dbToken.identifier,
+                token: dbToken.token,
+              },
+            },
+          });
         } catch (e) {
           console.error("Failed to delete expired verification token:", e);
         }
@@ -27,13 +33,19 @@ export async function GET(req: Request) {
       return NextResponse.redirect(new URL("/verified?status=error", req.url));
     }
 
-    // Atomically update user (set emailVerified)
     await prisma.$transaction([
       prisma.user.update({
         where: { email: dbToken.identifier },
         data: { emailVerified: new Date() },
       }),
-      prisma.verificationToken.delete({ where: { token } }),
+      prisma.verificationToken.delete({
+        where: {
+          identifier_token: {
+            identifier: dbToken.identifier,
+            token: dbToken.token,
+          },
+        },
+      }),
     ]);
 
     return NextResponse.redirect(new URL("/verified?status=success", req.url));
