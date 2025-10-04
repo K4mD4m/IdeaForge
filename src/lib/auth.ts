@@ -60,6 +60,26 @@ export const authOptions: NextAuthOptions = {
   },
 
   callbacks: {
+    async signIn({ user, account, profile }) {
+      // When signing in with Google or GitHub, set emailVerified if not set
+      if (account?.provider === "google" || account?.provider === "github") {
+        const existingUser = await prisma.user.findUnique({
+          where: { email: user.email! },
+          select: { emailVerified: true },
+        });
+
+        // If not exists or emailVerified is not set → set it
+        if (!existingUser?.emailVerified) {
+          await prisma.user.update({
+            where: { email: user.email! },
+            data: { emailVerified: new Date() },
+          });
+        }
+      }
+      return true;
+    },
+
+
     async redirect({ url, baseUrl }) {
       // after login redirect to dashboard
       return `${baseUrl}/dashboard`;
