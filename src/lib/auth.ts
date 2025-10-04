@@ -39,7 +39,7 @@ export const authOptions: NextAuthOptions = {
 
         const isValid = await bcrypt.compare(
           credentials.password,
-          user.hashedPassword
+          user.hashedPassword,
         );
 
         if (!isValid) return null;
@@ -60,7 +60,7 @@ export const authOptions: NextAuthOptions = {
   },
 
   callbacks: {
-    async signIn({ user, account, profile }) {
+    async signIn({ user, account }) {
       // When signing in with Google or GitHub, set emailVerified if not set
       if (account?.provider === "google" || account?.provider === "github") {
         const existingUser = await prisma.user.findUnique({
@@ -79,8 +79,7 @@ export const authOptions: NextAuthOptions = {
       return true;
     },
 
-
-    async redirect({ url, baseUrl }) {
+    async redirect({ baseUrl }) {
       // after login redirect to dashboard
       return `${baseUrl}/dashboard`;
     },
