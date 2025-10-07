@@ -64,13 +64,17 @@ export const authOptions: NextAuthOptions = {
       // When signing in with Google or GitHub, set emailVerified if not set
       if (account?.provider === "google" || account?.provider === "github") {
         try {
+          // Check if user exists
           const existingUser = await prisma.user.findUnique({
             where: { email: user.email! },
             select: { id: true, emailVerified: true },
           });
 
+          let userId = existingUser?.id;
+
+          // If user does not exist, create them
           if (!existingUser) {
-            await prisma.user.create({
+            const newUser = await prisma.user.create({
               data: {
                 email: user.email!,
                 name: user.name ?? "",
@@ -78,14 +82,41 @@ export const authOptions: NextAuthOptions = {
                 emailVerified: new Date(),
               },
             });
-          } else if (!existingUser.emailVerified) {
+            userId = newUser.id;
+          }
+          // If user exists but emailVerified is not set, update it
+          else if (!existingUser.emailVerified) {
             await prisma.user.update({
               where: { id: existingUser.id },
               data: { emailVerified: new Date() },
             });
           }
+
+          // Check if account OAuth is already linked
+          const existingAccount = await prisma.account.findFirst({
+            where: {
+              provider: account.provider,
+              providerAccountId: account.providerAccountId,
+            },
+          });
+
+          // If not, link OAuth account to user
+          if (!existingAccount && userId) {
+            await prisma.account.create({
+              data: {
+                userId,
+                type: account.type,
+                provider: account.provider,
+                providerAccountId: account.providerAccountId,
+                access_token: account.access_token ?? null,
+                refresh_token: account.refresh_token ?? null,
+                expires_at: account.expires_at ?? null,
+              },
+            });
+          }
         } catch (err) {
-          console.error("Error setting emailVerified for OAuth user:", err);
+          console.error("Error handling OAuth sign-in:", err);
+          return false; // block login if something went wrong
         }
       }
       return true;
