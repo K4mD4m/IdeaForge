@@ -63,17 +63,29 @@ export const authOptions: NextAuthOptions = {
     async signIn({ user, account }) {
       // When signing in with Google or GitHub, set emailVerified if not set
       if (account?.provider === "google" || account?.provider === "github") {
-        const existingUser = await prisma.user.findUnique({
-          where: { email: user.email! },
-          select: { emailVerified: true },
-        });
-
-        // If not exists or emailVerified is not set → set it
-        if (!existingUser?.emailVerified) {
-          await prisma.user.update({
+        try {
+          const existingUser = await prisma.user.findUnique({
             where: { email: user.email! },
-            data: { emailVerified: new Date() },
+            select: { id: true, emailVerified: true },
           });
+
+          if (!existingUser) {
+            await prisma.user.create({
+              data: {
+                email: user.email!,
+                name: user.name ?? "",
+                image: user.image ?? null,
+                emailVerified: new Date(),
+              },
+            });
+          } else if (!existingUser.emailVerified) {
+            await prisma.user.update({
+              where: { id: existingUser.id },
+              data: { emailVerified: new Date() },
+            });
+          }
+        } catch (err) {
+          console.error("Error setting emailVerified for OAuth user:", err);
         }
       }
       return true;
