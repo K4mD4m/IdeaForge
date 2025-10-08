@@ -27,6 +27,11 @@ export default function RegisterForm() {
       return;
     }
 
+    if (name.length < 4) {
+      setError("Name must be at least 4 characters long");
+      return;
+    }
+
     try {
       const res = await fetch("/api/register", {
         method: "POST",

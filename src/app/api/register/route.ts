@@ -22,6 +22,14 @@ export async function POST(req: Request) {
       );
     }
 
+    // Enforce minimum name length
+    if (name.length < 4) {
+      return NextResponse.json(
+        { error: "Name must be at least 4 characters long" },
+        { status: 400 }
+      );
+    }
+
     // Check if user already exists
     const existing = await prisma.user.findUnique({ where: { email } });
     if (existing) {
