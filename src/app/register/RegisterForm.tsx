@@ -22,6 +22,11 @@ export default function RegisterForm() {
     setError("");
     setLoading(true);
 
+    if (password.length < 8) {
+      setError("Password must be at least 8 characters long");
+      return;
+    }
+
     try {
       const res = await fetch("/api/register", {
         method: "POST",
