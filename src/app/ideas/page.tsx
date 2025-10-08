@@ -91,7 +91,7 @@ export default function IdeasWall() {
     <main className="min-h-screen min-w-screen bg-gradient-to-b from-[#0a0a0f] to-[#1a1a2e] text-white px-4 sm:px-6 lg:px-8 pt-24 pb-16 max-w-7xl mx-auto">
       {/* Sticky Filters Bar */}
       <motion.div
-        className="sticky top-16 z-50 bg-[#12121c]/90 backdrop-blur-md rounded-xl border border-white/10 shadow-md py-3 px-4 sm:px-5 flex flex-wrap gap-3 justify-center md:justify-start mb-8 max-w-full overflow-x-auto no-scrollbar"
+        className="sticky top-16 z-10 bg-[#12121c]/90 backdrop-blur-md rounded-xl border border-white/10 shadow-md py-3 px-4 sm:px-5 flex flex-wrap gap-3 justify-center md:justify-start mb-8 max-w-full overflow-x-auto no-scrollbar"
         initial={{ y: -20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ duration: 0.3 }}
@@ -209,10 +209,9 @@ function FilterButton({
       whileHover={{ scale: 1.1 }}
       whileTap={{ scale: 0.95 }}
       className={`px-4 py-1.5 rounded-full border text-sm font-semibold transition-colors duration-300 select-none
-        ${
-          active
-            ? "bg-purple-600 text-white border-purple-600 shadow-lg shadow-purple-600/50"
-            : "bg-transparent text-gray-400 border-gray-600 hover:bg-purple-700 hover:text-white"
+        ${active
+          ? "bg-purple-600 text-white border-purple-600 shadow-lg shadow-purple-600/50"
+          : "bg-transparent text-gray-400 border-gray-600 hover:bg-purple-700 hover:text-white"
         } cursor-pointer`}
       aria-pressed={active}
       type="button"
