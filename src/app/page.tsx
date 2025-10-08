@@ -56,7 +56,7 @@ export default function HomePage() {
         <motion.div
           animate={{ y: [0, 10, 0] }}
           transition={{ repeat: Infinity, duration: 1.5 }}
-          className="absolute bottom-6 text-cyan-400"
+          className="absolute bottom-6 text-cyan-400 lg:hidden"
         >
           <ArrowDown className="w-8 h-8" />
         </motion.div>

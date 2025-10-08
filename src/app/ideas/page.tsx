@@ -17,10 +17,10 @@ type Idea = {
 };
 
 const categories = ["Tech", "Marketing", "Design", "Business", "Other"];
-const popularityFilters = [
-  { id: "most-liked", label: "Most Liked" },
-  { id: "most-commented", label: "Most Commented" },
-];
+// const popularityFilters = [
+//   { id: "most-liked", label: "Most Liked" },
+//   { id: "most-commented", label: "Most Commented" },
+// ];
 
 export default function IdeasWall() {
   const [ideas, setIdeas] = useState<Idea[]>([]);
@@ -213,7 +213,7 @@ function FilterButton({
           active
             ? "bg-purple-600 text-white border-purple-600 shadow-lg shadow-purple-600/50"
             : "bg-transparent text-gray-400 border-gray-600 hover:bg-purple-700 hover:text-white"
-        }`}
+        } cursor-pointer`}
       aria-pressed={active}
       type="button"
     >

@@ -77,7 +77,7 @@ export default function LoginForm() {
           type="submit"
           className="w-full bg-purple-600 hover:bg-purple-700 transition text-white py-2.5 rounded-lg font-semibold shadow-lg shadow-purple-600/40 cursor-pointer"
         >
-          Login
+          {loading ? "Logging in..." : "Log In"}
         </motion.button>
 
         <div className="flex items-center gap-3">

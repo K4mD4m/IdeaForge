@@ -94,7 +94,7 @@ function FAQCard({ question, answer }: FAQItem) {
       transition={{ duration: 0.3 }}
     >
       <button
-        className="w-full flex justify-between items-center px-5 py-4 text-left text-lg font-semibold hover:bg-white/5 transition-colors"
+        className="w-full flex justify-between items-center px-5 py-4 text-left text-lg font-semibold hover:bg-white/5 transition-colors cursor-pointer"
         onClick={() => setOpen(!open)}
         aria-expanded={open}
       >
