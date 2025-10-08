@@ -1,7 +1,7 @@
 # 💡 IdeaForge — Share, Explore & Build Ideas
 
 **IdeaForge** is a modern web platform designed for sharing, exploring, and validating creative ideas.  
-Users can publish, like, comment, and discuss innovative projects — from startups to personal concepts.  
+Users can publish innovative projects — from startups to personal concepts.  
 Built with **Next.js 14**, **TypeScript**, and **Prisma**, it offers secure authentication, responsive UI, and smooth user experience.
 
 ---
