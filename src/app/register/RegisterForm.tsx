@@ -20,7 +20,6 @@ export default function RegisterForm() {
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError("");
-    setLoading(true);
 
     if (password.length < 8) {
       setError("Password must be at least 8 characters long");
@@ -36,6 +35,8 @@ export default function RegisterForm() {
       setError("Email is required");
       return;
     }
+
+    setLoading(true);
 
     try {
       const res = await fetch("/api/register", {
