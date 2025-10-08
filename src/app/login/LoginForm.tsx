@@ -9,10 +9,23 @@ export default function LoginForm() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError("");
+
+    if (!email) {
+      setError("Email is required");
+      return;
+    }
+
+    if (!password) {
+      setError("Password is required");
+      return;
+    }
+
+    setLoading(true);
 
     const res = await signIn("credentials", {
       redirect: true,
@@ -37,7 +50,11 @@ export default function LoginForm() {
       >
         <h1 className="text-2xl font-bold text-center">Welcome Back</h1>
 
-        {error && <p className="text-red-500 text-sm text-center">{error}</p>}
+        {error && (
+          <p className="text-red-400 text-sm text-center mb-4 font-medium">
+            {error}
+          </p>
+        )}
 
         <div className="space-y-4">
           <Input
