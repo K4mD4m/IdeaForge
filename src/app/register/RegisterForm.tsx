@@ -32,6 +32,11 @@ export default function RegisterForm() {
       return;
     }
 
+    if (!email) {
+      setError("Email is required");
+      return;
+    }
+
     try {
       const res = await fetch("/api/register", {
         method: "POST",
