@@ -14,6 +14,14 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Missing fields" }, { status: 400 });
     }
 
+    // Enforce minimum password length
+    if (password.length < 8) {
+      return NextResponse.json(
+        { error: "Password must be at least 8 characters long" },
+        { status: 400 }
+      );
+    }
+
     // Check if user already exists
     const existing = await prisma.user.findUnique({ where: { email } });
     if (existing) {
