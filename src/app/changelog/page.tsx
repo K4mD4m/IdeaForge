@@ -5,7 +5,7 @@ import { motion } from "framer-motion";
 const changelog = [
   {
     version: "v1.0.0",
-    date: "2025-08-15",
+    date: "2025-10-11",
     title: "MVP Launch",
     description:
       "Initial release of IdeaForge with user accounts, idea sharing wall, and basic UI.",
