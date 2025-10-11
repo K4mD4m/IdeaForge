@@ -4,9 +4,9 @@ import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 
 export default function VerifiedContent() {
-  const searchParams = useSearchParams();
-  const status = searchParams.get("status");
-  const isSuccess = status === "success";
+  const searchParams = useSearchParams(); // Get URL search params
+  const status = searchParams.get("status"); // Get status param
+  const isSuccess = status === "success"; // Check if verification was successful
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-gray-900 px-4">

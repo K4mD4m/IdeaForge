@@ -28,15 +28,19 @@ export const authOptions: NextAuthOptions = {
         email: { label: "Email", type: "text" },
         password: { label: "Password", type: "password" },
       },
+      // Authorize user with email and password
       async authorize(credentials) {
         if (!credentials?.email || !credentials.password) return null;
 
+        // Find user by email
         const user = await prisma.user.findUnique({
           where: { email: credentials.email },
         });
 
+        // If user not found or has no password, return null
         if (!user || !user.hashedPassword) return null;
 
+        // Compare hashed passwords
         const isValid = await bcrypt.compare(
           credentials.password,
           user.hashedPassword,
@@ -49,6 +53,7 @@ export const authOptions: NextAuthOptions = {
     }),
   ],
 
+  // Use JWT strategy for sessions
   session: {
     strategy: "jwt",
   },
@@ -133,6 +138,7 @@ export const authOptions: NextAuthOptions = {
       }
       return session;
     },
+    // Include emailVerified in JWT token
     async jwt({ token, user }) {
       if (user) {
         token.emailVerified = (user as User).emailVerified ?? null;

@@ -6,11 +6,12 @@ import { motion } from "framer-motion";
 import { Github, Chrome } from "lucide-react";
 
 export default function LoginForm() {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
-  const [loading, setLoading] = useState(false);
+  const [email, setEmail] = useState(""); // User email
+  const [password, setPassword] = useState(""); // User password
+  const [error, setError] = useState(""); // Error message
+  const [loading, setLoading] = useState(false); // Loading state
 
+  // Handle form submission
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError("");
@@ -27,6 +28,7 @@ export default function LoginForm() {
 
     setLoading(true);
 
+    // Sign in using credentials provider
     const res = await signIn("credentials", {
       redirect: true,
       email,
@@ -110,6 +112,7 @@ export default function LoginForm() {
   );
 }
 
+// Reusable Input Component
 function Input({
   type = "text",
   ...props
@@ -123,6 +126,7 @@ function Input({
   );
 }
 
+// Social Login Button Component
 function SocialButton({
   provider,
   icon,

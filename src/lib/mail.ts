@@ -1,8 +1,10 @@
 import nodemailer from "nodemailer";
 
+// Send verification email to user
 export async function sendVerificationEmail(email: string, token: string) {
   const confirmUrl = `${process.env.NEXT_PUBLIC_APP_URL}/api/verify?token=${token}`;
 
+  // Create reusable transporter object using SMTP transport
   const transporter = nodemailer.createTransport({
     service: "gmail",
     auth: {
@@ -11,6 +13,7 @@ export async function sendVerificationEmail(email: string, token: string) {
     },
   });
 
+  // Send mail with defined transport object
   await transporter.sendMail({
     from: process.env.GMAIL_USER,
     to: email,

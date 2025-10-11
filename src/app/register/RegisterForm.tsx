@@ -7,20 +7,22 @@ import { signIn } from "next-auth/react";
 import { Mail, Lock, User, Github, Chrome } from "lucide-react";
 
 export default function RegisterForm() {
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
-  const [loading, setLoading] = useState(false);
+  const [name, setName] = useState(""); // User name
+  const [email, setEmail] = useState(""); // User email
+  const [password, setPassword] = useState(""); // User password
+  const [error, setError] = useState(""); // Error message
+  const [loading, setLoading] = useState(false); // Loading state
 
-  const router = useRouter();
-  const searchParams = useSearchParams();
-  const callbackUrl = searchParams.get("callbackUrl") || "/dashboard";
+  const router = useRouter(); // Next.js router
+  const searchParams = useSearchParams(); // Get URL search params
+  const callbackUrl = searchParams.get("callbackUrl") || "/dashboard"; // Redirect after registration
 
+  // Handle form submission
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError("");
 
+    // Basic validation
     if (password.length < 8) {
       setError("Password must be at least 8 characters long");
       return;
@@ -38,6 +40,7 @@ export default function RegisterForm() {
 
     setLoading(true);
 
+    // Send registration request to API
     try {
       const res = await fetch("/api/register", {
         method: "POST",
@@ -141,6 +144,7 @@ export default function RegisterForm() {
   );
 }
 
+// Reusable Input Component
 function Input({
   icon,
   type = "text",
@@ -160,6 +164,7 @@ function Input({
   );
 }
 
+// Social Login Button Component
 function SocialButton({
   onClick,
   icon,

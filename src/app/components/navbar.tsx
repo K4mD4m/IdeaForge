@@ -8,8 +8,8 @@ import { Button } from "@/components/ui/button";
 import { Menu, X } from "lucide-react";
 
 export const Navbar = () => {
-  const { data: session } = useSession();
-  const [mobileOpen, setMobileOpen] = useState(false);
+  const { data: session } = useSession(); // Get user session
+  const [mobileOpen, setMobileOpen] = useState(false); // Mobile menu state
 
   const menuLinks = [
     { href: "/", label: "Home" },

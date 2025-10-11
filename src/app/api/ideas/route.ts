@@ -63,6 +63,7 @@ export async function POST(req: Request) {
       exists = await prisma.idea.findUnique({ where: { slug } });
     }
 
+    // create idea
     const newIdea = await prisma.idea.create({
       data: {
         title,

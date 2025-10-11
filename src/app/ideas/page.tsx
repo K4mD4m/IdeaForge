@@ -23,13 +23,13 @@ const categories = ["Tech", "Marketing", "Design", "Business", "Other"];
 // ];
 
 export default function IdeasWall() {
-  const [ideas, setIdeas] = useState<Idea[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [ideas, setIdeas] = useState<Idea[]>([]); // All fetched ideas
+  const [loading, setLoading] = useState(true); // Loading state
   const [activeFilter, setActiveFilter] = useState<
     "all" | "popularity" | "category"
-  >("all");
-  const [activePopularity, setActivePopularity] = useState<string | null>(null);
-  const [activeCategory, setActiveCategory] = useState<string | null>(null);
+  >("all"); // Current filter type
+  const [activePopularity, setActivePopularity] = useState<string | null>(null); // Current popularity filter
+  const [activeCategory, setActiveCategory] = useState<string | null>(null); // Current category filter
   const [visibleCount, setVisibleCount] = useState(16);
 
   function handleSelectFilter(
@@ -49,6 +49,7 @@ export default function IdeasWall() {
     }
   }
 
+  // Apply sorting and filtering
   const sortedIdeas = (() => {
     // if (activeFilter === "popularity" && activePopularity === "most-liked") {
     //   // Sort by upvotes descending
@@ -71,6 +72,7 @@ export default function IdeasWall() {
     return ideas;
   })();
 
+  // Fetch ideas on component mount
   useEffect(() => {
     async function fetchIdeas() {
       setLoading(true);
@@ -88,8 +90,9 @@ export default function IdeasWall() {
     fetchIdeas();
   }, []);
 
-  const paginatedIdeas = sortedIdeas.slice(0, visibleCount);
+  const paginatedIdeas = sortedIdeas.slice(0, visibleCount); // Ideas to display based on visibleCount
 
+  // Reset visible count when filters change
   useEffect(() => {
     setVisibleCount(16);
   }, [activeFilter, activeCategory, activePopularity]);
@@ -210,6 +213,7 @@ export default function IdeasWall() {
   );
 }
 
+// Filter Button Component
 function FilterButton({
   active,
   children,

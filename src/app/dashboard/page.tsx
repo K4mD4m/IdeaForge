@@ -20,10 +20,10 @@ type Idea = {
 };
 
 export default function DashboardPage() {
-  const router = useRouter();
-  const { data: session, status } = useSession();
-  const userId = session?.user?.id ?? "";
-  const emailVerified = !!session?.user?.emailVerified;
+  const router = useRouter(); // For navigation
+  const { data: session, status } = useSession(); // Get user session
+  const userId = session?.user?.id ?? ""; // Current user ID
+  const emailVerified = !!session?.user?.emailVerified; // Email verified status
 
   // Redirect unauthenticated users to login
   useEffect(() => {
@@ -76,6 +76,7 @@ export default function DashboardPage() {
     }
   }, [userId]);
 
+  // Fetch ideas on component mount and when userId changes
   useEffect(() => {
     fetchIdeas();
   }, [fetchIdeas]);
@@ -110,7 +111,7 @@ export default function DashboardPage() {
           description: form.description,
           category: form.category || null,
           tags: [],
-          published: emailVerified ? form.published : false, // wymuszenie blokady
+          published: emailVerified ? form.published : false,
         }),
       });
       const data = await safeJson(res);

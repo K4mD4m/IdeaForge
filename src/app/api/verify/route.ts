@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 
+// GET: verify email using token
 export async function GET(req: Request) {
   try {
     const { searchParams } = new URL(req.url);
@@ -15,6 +16,7 @@ export async function GET(req: Request) {
       where: { token },
     });
 
+    // If token not found or expired, redirect to error page
     if (!dbToken || dbToken.expires.getTime() < Date.now()) {
       if (dbToken) {
         try {
@@ -33,6 +35,7 @@ export async function GET(req: Request) {
       return NextResponse.redirect(new URL("/verified?status=error", req.url));
     }
 
+    // Update user's emailVerified field and delete the token
     await prisma.$transaction([
       prisma.user.update({
         where: { email: dbToken.identifier },

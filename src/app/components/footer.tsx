@@ -130,6 +130,7 @@ export default function Footer() {
   );
 }
 
+// Simple link that handles internal/external links and adds appropriate attributes
 function FooterLink({
   href,
   children,
@@ -155,6 +156,7 @@ function FooterLink({
   );
 }
 
+// Icon link for social media / external links
 function IconLink({
   href,
   label,
