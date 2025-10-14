@@ -14,7 +14,7 @@ const ratelimit = new Ratelimit({
     analytics: true,
 });
 
-const handler = async (req: Request, ...args: any[]) => {
+const handler = async (req: Request, ...args: unknown[]) => {
     // Get IP address
     const ip =
         req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ||
@@ -26,7 +26,6 @@ const handler = async (req: Request, ...args: any[]) => {
         return NextResponse.json({ error: "Too many requests" }, { status: 429 });
     }
 
-    // @ts-ignore
     return NextAuth(authOptions)(req, ...args);
 };
 
